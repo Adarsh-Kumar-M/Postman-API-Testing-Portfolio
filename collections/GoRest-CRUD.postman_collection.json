@@ -1,0 +1,470 @@
+{
+  "info": {
+    "_postman_id": "66e5ef9c-8114-4101-b109-0b68081df228",
+    "name": "GoRest-CRUD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1-Post Request for Create User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const response=pm.response.json();",
+              "",
+              "const id=response.id;",
+              "pm.collectionVariables.set(\"userId\", id);",
+              "",
+              "const email=response.email;",
+              "",
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "",
+              "const requestBody=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const reqEmail=requestBody.email;",
+              "const reqname=requestBody.name;",
+              "",
+              "",
+              "pm.collectionVariables.set(\"reqName\", reqname);",
+              "",
+              "",
+              "pm.collectionVariables.set(\"reqEmail\", requestBody.email);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"{{$randomFullName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"gender\": \"male\",\n    \"status\": \"active\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2-Fetching Created User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Comparing the post request Email and Name against GET response Email and Name\", function () {",
+              "    const getResponce = pm.response.json();",
+              "    pm.expect(getResponce.email).to.eql(pm.collectionVariables.get(\"reqEmail\"));",
+              "    pm.expect(getResponce.name).to.eql(pm.collectionVariables.get(\"reqName\"));    ",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3-Update the created User Data",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const response=pm.response.json();",
+              "",
+              "",
+              "const requestBody=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const requestEmail=requestBody.email;",
+              "pm.collectionVariables.set(\"requestEmail\", requestEmail);",
+              "",
+              "const requestName=requestBody.name;",
+              "pm.collectionVariables.set(\"requestName\", requestName);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"gender\": \"male\",\n    \"status\": \"active\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4- Fetch Fully updated user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Comparing the Put request Email and Name against the Get response\", function () {",
+              "    const getResponce = pm.response.json();",
+              "    pm.expect(getResponce.email).to.eql(pm.collectionVariables.get(\"requestEmail\"));",
+              "    pm.expect(getResponce.name).to.eql(pm.collectionVariables.get(\"requestName\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5-Partial Updation of Created User Data",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const PatchResponse=pm.response.json();",
+              "",
+              "const patchRequestBody=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const userStatus=patchRequestBody.status;",
+              "pm.collectionVariables.set(\"userStatus\", userStatus);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n   \n    \"status\": \"inactive\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6-Fetch Partially Updated Data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Comparing the Patch request user status against Get response\", function () {",
+              "    const getResponce = pm.response.json();",
+              "    pm.expect(getResponce.status).to.eql(pm.collectionVariables.get(\"userStatus\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7-Delete Created User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 204\", function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8-Fetch Deleted User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/public/v2/users/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "public",
+            "v2",
+            "users",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

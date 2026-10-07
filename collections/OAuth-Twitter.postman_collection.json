@@ -1,0 +1,364 @@
+{
+  "info": {
+    "_postman_id": "6a482b7c-5790-4ba7-8038-75e90c48e1ec",
+    "name": "OAuth-Twitter",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1-Generate Temporary Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"OAuth response status is 200\", () => pm.response.to.have.status(200));",
+              "const params = require(\"postman-collection\").QueryParam.parse(pm.response.text());",
+              "const token = params.find(p => p.key === \"oauth_token\");",
+              "const secret = params.find(p => p.key === \"oauth_token_secret\");",
+              "pm.test(\"OAuth token and secret are present\", () => {",
+              "    pm.expect(token && token.value).to.be.a(\"string\").and.not.empty;",
+              "    pm.expect(secret && secret.value).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "if (token && secret) {",
+              "    pm.environment.set(\"oAuth_Temp_Token\", token.value);",
+              "    pm.environment.set(\"oAuth_Temp_Token_Secret\", secret.value);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            {
+              "key": "consumerSecret",
+              "value": "{{consumerSecret}}",
+              "type": "string"
+            },
+            {
+              "key": "callback",
+              "value": "oob",
+              "type": "string"
+            },
+            {
+              "key": "consumerKey",
+              "value": "{{consumerKey}}",
+              "type": "string"
+            },
+            {
+              "key": "signatureMethod",
+              "value": "HMAC-SHA1",
+              "type": "string"
+            },
+            {
+              "key": "version",
+              "value": "1.0",
+              "type": "string"
+            },
+            {
+              "key": "addParamsToHeader",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "key": "tokenSecret",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "token",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "verifier",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "addEmptyParamsToSign",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.twitter.com/oauth/request_token",
+          "protocol": "https",
+          "host": [
+            "api",
+            "twitter",
+            "com"
+          ],
+          "path": [
+            "oauth",
+            "request_token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2-Authorise Yourself",
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            {
+              "key": "tokenSecret",
+              "value": "{{oAuth_Temp_Token_Secret}}",
+              "type": "string"
+            },
+            {
+              "key": "token",
+              "value": "{{oAuth_Temp_Token}}",
+              "type": "string"
+            },
+            {
+              "key": "consumerSecret",
+              "value": "{{consumerSecret}}",
+              "type": "string"
+            },
+            {
+              "key": "callback",
+              "value": "oob",
+              "type": "string"
+            },
+            {
+              "key": "consumerKey",
+              "value": "{{consumerKey}}",
+              "type": "string"
+            },
+            {
+              "key": "verifier",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "signatureMethod",
+              "value": "HMAC-SHA1",
+              "type": "string"
+            },
+            {
+              "key": "version",
+              "value": "1.0",
+              "type": "string"
+            },
+            {
+              "key": "addParamsToHeader",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addEmptyParamsToSign",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.twitter.com/oauth/authorize?oauth_token={{oAuth_Temp_Token}}",
+          "protocol": "https",
+          "host": [
+            "api",
+            "twitter",
+            "com"
+          ],
+          "path": [
+            "oauth",
+            "authorize"
+          ],
+          "query": [
+            {
+              "key": "oauth_token",
+              "value": "{{oAuth_Temp_Token}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3-Exchange Temporary Token for Permanent Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"OAuth response status is 200\", () => pm.response.to.have.status(200));",
+              "const params = require(\"postman-collection\").QueryParam.parse(pm.response.text());",
+              "const token = params.find(p => p.key === \"oauth_token\");",
+              "const secret = params.find(p => p.key === \"oauth_token_secret\");",
+              "pm.test(\"OAuth token and secret are present\", () => {",
+              "    pm.expect(token && token.value).to.be.a(\"string\").and.not.empty;",
+              "    pm.expect(secret && secret.value).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "if (token && secret) {",
+              "    pm.environment.set(\"oauth_Permanent_Token\", token.value);",
+              "    pm.environment.set(\"oauth_Permanent_Token_Secret\", secret.value);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            {
+              "key": "verifier",
+              "value": "{{verifierToken}}",
+              "type": "string"
+            },
+            {
+              "key": "tokenSecret",
+              "value": "{{oAuth_Temp_Token_Secret}}",
+              "type": "string"
+            },
+            {
+              "key": "token",
+              "value": "{{oAuth_Temp_Token}}",
+              "type": "string"
+            },
+            {
+              "key": "consumerSecret",
+              "value": "{{consumerSecret}}",
+              "type": "string"
+            },
+            {
+              "key": "callback",
+              "value": "oob",
+              "type": "string"
+            },
+            {
+              "key": "consumerKey",
+              "value": "{{consumerKey}}",
+              "type": "string"
+            },
+            {
+              "key": "signatureMethod",
+              "value": "HMAC-SHA1",
+              "type": "string"
+            },
+            {
+              "key": "version",
+              "value": "1.0",
+              "type": "string"
+            },
+            {
+              "key": "addParamsToHeader",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addEmptyParamsToSign",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.twitter.com/oauth/access_token",
+          "protocol": "https",
+          "host": [
+            "api",
+            "twitter",
+            "com"
+          ],
+          "path": [
+            "oauth",
+            "access_token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4-Fetching Protected Resources",
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            {
+              "key": "verifier",
+              "value": "{{verifierToken}}",
+              "type": "string"
+            },
+            {
+              "key": "tokenSecret",
+              "value": "{{oauth_Permanent_Token_Secret}}",
+              "type": "string"
+            },
+            {
+              "key": "token",
+              "value": "{{oauth_Permanent_Token}}",
+              "type": "string"
+            },
+            {
+              "key": "consumerSecret",
+              "value": "{{consumerSecret}}",
+              "type": "string"
+            },
+            {
+              "key": "callback",
+              "value": "oob",
+              "type": "string"
+            },
+            {
+              "key": "consumerKey",
+              "value": "{{consumerKey}}",
+              "type": "string"
+            },
+            {
+              "key": "signatureMethod",
+              "value": "HMAC-SHA1",
+              "type": "string"
+            },
+            {
+              "key": "version",
+              "value": "1.0",
+              "type": "string"
+            },
+            {
+              "key": "addParamsToHeader",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addEmptyParamsToSign",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.twitter.com/1.2/statuses/home_timeline.json",
+          "protocol": "https",
+          "host": [
+            "api",
+            "twitter",
+            "com"
+          ],
+          "path": [
+            "1.2",
+            "statuses",
+            "home_timeline.json"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

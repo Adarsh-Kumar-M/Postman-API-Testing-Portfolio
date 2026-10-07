@@ -1,0 +1,254 @@
+{
+  "info": {
+    "_postman_id": "cfb70df8-48fa-4e37-9269-09d12c388df5",
+    "name": "Postman-Scripting-Examples",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Learning examples for array assertions, response subsets, delays, and deliberate fail/skip behavior. The final request intentionally fails."
+  },
+  "item": [
+    {
+      "name": "Postman Scrips",
+      "item": [
+        {
+          "name": "1-Get Data From Array and Assert",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseData=pm.response.json(); //Fetch Response and assign it to variable ",
+                  "const filterData=responseData.json.filters;  //parse fetch the data from responseData to path jason->filters  from the response.",
+                  "",
+                  "const names=filterData.map(function(e)  //map function to iterate over the array of filters and print the response of each filter.",
+                  "{",
+                  "        return e.name;   //returing and storing all the names in const names variable",
+                  "}",
+                  ")",
+                  "",
+                  "",
+                  "const index=names.indexOf(\"COUNTRY\"); // finding the index of the name \"COUNTRY\" in the array of names.",
+                  "",
+                  "const countryData=filterData[index];",
+                  "",
+                  "pm.test(\"Checking country data details\", function () { //add json valus check test from snippte",
+                  "    pm.expect(countryData.id).to.eql(102); //to check country id is 102 or not ",
+                  "     pm.expect(countryData).exist;  //to check country data exists or not ",
+                  "});",
+                  "",
+                  "pm.test(\"Checking country data is allowed or not\", function () { ",
+                  "     pm.expect(countryData.isAllowed).to.be.true;  //to check country data exists or not ",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"companyId\": 10101,\n    \"regionId\": 36554,\n    \"filters\": [\n        {\n            \"id\": 101,\n            \"name\": \"VENDOR\",\n            \"isAllowed\": false\n        },\n        {\n            \"id\": 102,\n            \"name\": \"COUNTRY\",\n            \"isAllowed\": true\n        },\n        {\n            \"id\": 103,\n            \"name\": \"MANUFACTURER\",\n            \"isAllowed\": false\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://httpbin.org/post",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "post"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2-Compare value of Response with Multiple Options",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "",
+                  "",
+                  "",
+                  "",
+                  "const responseData=pm.response.json();",
+                  "const targetValue=responseData.json.ACL;",
+                  "",
+                  "const target=targetValue.map(function (e){",
+                  "    return e.Target;",
+                  "    ",
+                  "})",
+                  "",
+                  "const index=target.indexOf(\"Subscriber\");",
+                  "const targetData=targetValue[index];",
+                  "pm.test(\"Check SUbscriber\", function () {",
+                  "    pm.expect(targetData.Target).to.eql(\"Subscriber\");",
+                  "    pm.expect(targetData.Target).to.be.oneOf([\"Subscriber\", \"Tata\"])",
+                  "});",
+                  "",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"test123\",\n  \"ACL\": [\n    {\n      \"GroupName\": \"test automation\",\n      \"Target\": \"Subscriber\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "https://httpbin.org/post",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "post"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3-Partial Response Validation from multiple response data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json().json;",
+                  "pm.test(\"Response includes expected fields\", () => {",
+                  "    pm.expect(data).to.include({username: \"qa_demo\", email: \"qa@example.com\"});",
+                  "    pm.expect(data).to.have.property(\"id\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "https://httpbin.org/post",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\": 101, \"username\": \"qa_demo\", \"email\": \"qa@example.com\", \"role\": \"tester\"}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4-Delaying the Request by Adding Script in Pre-Request",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "setTimeout( () => {}, 4000); ",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://fake-json-api.mock.beeceptor.com/users",
+              "protocol": "https",
+              "host": [
+                "fake-json-api",
+                "mock",
+                "beeceptor",
+                "com"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Cases Status",
+      "item": [
+        {
+          "name": "5-Intentional Failure and Skipped Test (Learning Demo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test.skip(\"Status code is 200\", function () { // To Skip the Test case",
+                  "    pm.response.to.have.status(200);",
+                  "  ",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is present\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect.fail(); // To Fail the Test case",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://fake-json-api.mock.beeceptor.com/users",
+              "protocol": "https",
+              "host": [
+                "fake-json-api",
+                "mock",
+                "beeceptor",
+                "com"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "Intentionally produces one failed assertion and one skipped test. Exclude this request when checking for a green run."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

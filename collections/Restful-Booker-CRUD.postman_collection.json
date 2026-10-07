@@ -1,0 +1,542 @@
+{
+  "info": {
+    "_postman_id": "9bed0256-e332-425b-b69d-14e48e6c7d12",
+    "name": "Restful-Booker-CRUD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1- Get All Booking Ids",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BaseURI}}/booking",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2-Create a Booking",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "const postResponse=pm.response.json();",
+              "",
+              "const booking_Id=postResponse.bookingid;",
+              "pm.collectionVariables.set(\"bookingId\", booking_Id);",
+              "",
+              "const postRequest=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const first_Name=postRequest.firstname;",
+              "pm.collectionVariables.set(\"firstName\", first_Name);",
+              "",
+              "const last_Name=postRequest.lastname;",
+              "pm.collectionVariables.set(\"lastName\", last_Name);",
+              "",
+              "const total_Price=postRequest.totalprice;",
+              "pm.collectionVariables.set(\"totalPrice\", total_Price);",
+              "",
+              "",
+              "const deposit_Paid = postRequest.depositpaid;",
+              "pm.collectionVariables.set(\"depositPaid\", deposit_Paid);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"firstname\" : \"{{$randomFirstName}}\",\n    \"lastname\" : \"{{$randomLastName}}\",\n    \"totalprice\" : {{$randomInt}},\n    \"depositpaid\" : {{$randomBoolean}},\n    \"bookingdates\" : {\n        \"checkin\" : \"2030-01-01\",\n        \"checkout\" : \"2030-01-05\"\n    },\n    \"additionalneeds\" : \"{{$randomWord}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/booking",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3-Fetching Already Created Booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Compare POST request data with GET response\", function () {",
+              "    const getResponse = pm.response.json();",
+              "",
+              "    pm.expect(getResponse.firstname).to.eql(pm.collectionVariables.get(\"firstName\"));",
+              "    pm.expect(getResponse.lastname).to.eql(pm.collectionVariables.get(\"lastName\"));",
+              "    pm.expect(getResponse.totalprice).to.eql(pm.collectionVariables.get(\"totalPrice\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BaseURI}}/booking/{{bookingId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4-Generate Auth",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "const response=pm.response.json();",
+              "",
+              "const tokenId=response.token",
+              "pm.environment.set(\"tokenId\", tokenId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\" : \"admin\",\n    \"password\" : \"password123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/auth",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5-Updates a Current Booking",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "const putRequest=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const first_Name=putRequest.firstname;",
+              "pm.collectionVariables.set(\"firstName\", first_Name);",
+              "",
+              "const last_Name=putRequest.lastname;",
+              "pm.collectionVariables.set(\"lastName\", last_Name);",
+              "",
+              "const total_Price=putRequest.totalprice;",
+              "pm.collectionVariables.set(\"totalPrice\", total_Price);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "token={{tokenId}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"firstname\" : \"{{$randomFirstName}}\",\n    \"lastname\" : \"{{$randomLastName}}\",\n    \"totalprice\" : {{$randomInt}},\n    \"depositpaid\" : {{$randomBoolean}},\n    \"bookingdates\" : {\n        \"checkin\" : \"2030-01-01\",\n        \"checkout\" : \"2030-01-05\"\n    },\n    \"additionalneeds\" : \"{{$randomWord}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/booking/{{bookingId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6-Fetch Updated Booking Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Compare POST request data with GET response\", function () {",
+              "    const getResponse = pm.response.json();",
+              "",
+              "    pm.expect(getResponse.firstname).to.eql(pm.collectionVariables.get(\"firstName\"));",
+              "    pm.expect(getResponse.lastname).to.eql(pm.collectionVariables.get(\"lastName\"));",
+              "    pm.expect(getResponse.totalprice).to.eql(pm.collectionVariables.get(\"totalPrice\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BaseURI}}/booking/{{bookingId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7-Partially Update the Booking Details",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "const patchRequest = JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const first_Name = patchRequest.firstname;",
+              "pm.collectionVariables.set(\"firstName\", first_Name);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "token={{tokenId}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"firstname\" : \"{{$randomFirstName}}\",\n    \"depositpaid\" : {{$randomBoolean}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/booking/{{bookingId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8-Fetch Partial Updated Booking Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Compare POST request data with GET response\", function () {",
+              "    const getResponse = pm.response.json();",
+              "",
+              "    pm.expect(getResponse.firstname).to.eql(pm.collectionVariables.get(\"firstName\"));",
+              "    pm.expect(getResponse.lastname).to.eql(pm.collectionVariables.get(\"lastName\"));",
+              "    pm.expect(getResponse.totalprice).to.eql(pm.collectionVariables.get(\"totalPrice\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{BaseURI}}/booking/{{bookingId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9-Delete Created Booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "token={{tokenId}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/booking/{{bookingId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "booking",
+            "{{bookingId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BaseURI",
+      "value": "https://restful-booker.herokuapp.com"
+    },
+    {
+      "key": "depositPaid",
+      "value": ""
+    },
+    {
+      "key": "tokenId",
+      "value": ""
+    }
+  ]
+}

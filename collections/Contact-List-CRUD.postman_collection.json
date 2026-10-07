@@ -1,0 +1,483 @@
+{
+  "info": {
+    "_postman_id": "f275f753-cd6d-472b-acc4-cf7c78695a71",
+    "name": "Contact-List-CRUD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1-Login into Contact List App",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    });",
+              "",
+              "pm.test(\"Body matches string\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"adarshkumar34421@gmail.com\");",
+              "});",
+              "",
+              "pm.test(\"First name should be Adarsh Kumar\", function () {",
+              "    const firstName = pm.response.json();",
+              "    pm.expect(firstName.user.firstName).to.eql(\"Adarsh Kumar\");",
+              "});",
+              "",
+              "const postResponse=pm.response.json();",
+              "",
+              "const token_Id=postResponse.token;",
+              "pm.collectionVariables.set(\"tokenId\", token_Id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"adarshkumar34421@gmail.com\",\n    \"password\": \"adarsh@123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/users/login",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2-Create a Fresh Contact",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Content-Type is application/json\", function () {",
+              "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+              "        .to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"Status code name has string\", function () {",
+              "    pm.response.to.have.status(\"Created\");",
+              "});",
+              "",
+              "const postResponse=pm.response.json();",
+              "",
+              "const user_Id=postResponse._id;",
+              "pm.collectionVariables.set(\"userId\", user_Id);",
+              "",
+              "const postRequestBody=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const firstName=postRequestBody.firstName;",
+              "pm.collectionVariables.set(\"firstName\", firstName);",
+              "",
+              "const city=postRequestBody.city;",
+              "pm.collectionVariables.set(\"city\", city);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"firstName\": \"{{$randomFirstName}}\",\n    \"lastName\": \"{{$randomLastName}}\",\n    \"birthdate\": \"2000-01-01\",\n    \"city\": \"{{$randomCity}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/contacts",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "contacts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3- Fetching All the Contacts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Content-Type is application/json\", function () {",
+              "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+              "        .to.include(\"application/json\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/contacts",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "contacts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4-Fetching Recent Contact User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Content-Type is application/json\", function () {",
+              "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+              "        .to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"Comparing Post request first name and city against Get response\", function () {",
+              "    const getResponse = pm.response.json();",
+              "    pm.expect(getResponse.firstName).to.eql(pm.collectionVariables.get(\"firstName\"));",
+              "   pm.expect(getResponse.city).to.eql(pm.collectionVariables.get(\"city\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/contacts/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "contacts",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5-Update Contact Details (PUT)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const resolvedBody = pm.variables.replaceIn(pm.request.body.raw);",
+              "pm.request.body.update(resolvedBody);",
+              "pm.collectionVariables.set(\"lastRequestBody\", resolvedBody);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Content-Type is application/json\", function () {",
+              "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+              "        .to.include(\"application/json\");",
+              "});",
+              "",
+              "const putRequest=JSON.parse(pm.collectionVariables.get(\"lastRequestBody\"));",
+              "const updatedFirstName=putRequest.firstName;",
+              "pm.collectionVariables.set(\"updated_FirstName\", updatedFirstName);",
+              "",
+              "const updatedLastName=putRequest.lastName;",
+              "pm.collectionVariables.set(\"updated_LastName\", updatedLastName);",
+              "",
+              "const updatedCity=putRequest.city;",
+              "pm.collectionVariables.set(\"updated_City\", updatedCity);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"firstName\": \"{{$randomFirstName}}\",\n    \"lastName\": \"{{$randomLastName}}\",\n    \"city\": \"{{$randomCity}}\"\n \n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BaseURI}}/contacts/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "contacts",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6-Fetch Updated User Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});",
+              "",
+              "pm.test(\"Content-Type is application/json\", function () {",
+              "    pm.expect(pm.response.headers.get(\"Content-Type\"))",
+              "        .to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"Comparing updated Put request first name, last name and city against Get response\", function () {",
+              "    const getResponse = pm.response.json();",
+              "    pm.expect(getResponse.firstName).to.eql(pm.collectionVariables.get(\"updated_FirstName\"));",
+              "    pm.expect(getResponse.lastName).to.eql(pm.collectionVariables.get(\"updated_LastName\"));",
+              "    pm.expect(getResponse.city).to.eql(pm.collectionVariables.get(\"updated_City\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/contacts/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "contacts",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7-Delete The User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/contacts/{{userId}}",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "contacts",
+            "{{userId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8- Logout from the App",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenId}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BaseURI}}/users/logout",
+          "host": [
+            "{{BaseURI}}"
+          ],
+          "path": [
+            "users",
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
