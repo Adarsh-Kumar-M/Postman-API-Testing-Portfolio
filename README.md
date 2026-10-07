@@ -94,4 +94,4 @@ The prepared files were checked for JSON readability and JavaScript syntax. Scri
 
 ## Author
 
-[Adarsh Kumar M](https://github.com/Adarsh-Kumar-M) — QA Engineer / Software Engineer in Test.
+[Adarsh Kumar M](https://github.com/Adarsh-Kumar-M) — SDET-1.
